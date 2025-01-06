@@ -2,12 +2,26 @@ const express = require('express');
 
 const app = express();
 
-app.use("/api", (req, res)=>{
-    res.send("This is the server use api")
+
+app.get("/te*st", (req, res)=>{
+    res.send("TEST")
+})
+app.get("/user/:userid/:username", (req, res)=>{
+    console.log(req.query); 
+    console.log(req.params.username)
+    res.send("HOME")
 })
 
-app.use("/test", (req, res)=>{
-    res.send("This is the server use test")
+app.post("/user", (req, res)=>{
+    res.send("POST user")
+})
+
+app.delete("/user", (req, res)=>{
+    res.send("DELETE user") 
+})
+
+app.put("/user", (req, res)=>{
+    res.send("PUT user")
 })
 
 app.listen(3000, ()=>{
