@@ -1,3 +1,1 @@
-start the server:
-
-npm run start/dev
+START the server: npm run start/dev
