@@ -1,36 +1,40 @@
 const express = require('express');
 const admin = require('./middlewares/adminAuth')
 const {adminAuth, userAuth} = require('./middlewares/adminAuth');
+const connectDB = require('../src/config/database')
+const {UserModel} = require('../src/models/user')
 
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
 
-app.use("/admin", adminAuth)
+app.post("/signup", async (req, res)=>{
+    
+    const user = new UserModel({
+        firstName: "Tim",
+        lastName: "Cook",
+        email: "tim@gmail.com",
+        password: "123456"
+    })
 
-app.get("/admin/getAllData", (req, res)=>{
-    // throw new Error("FAKE ERROR !!!")
-    res.send("All data fetched !")
+    try{
+        await user.save();
+    }
+    catch(err){
+        console.log("ERROR = ", err);
+        res.status(400).send("Error in post req for database")
+    }
+    res.send("User created SUCCESSFULLY!!!!");
 })
 
-app.get("/admin/deleteAllData", (req, res)=>{
-    res.send("All data deleted !")
-})
 
-app.get("/user/getAllData", userAuth, (req, res)=>{
-    res.send("All USER data fetched !")
-})
 
-app.post("/user/registerUser", userAuth, (req, res)=>{
-    res.send("User registered !")
+connectDB()
+.then(()=>{
+    console.log('Connected to MongoDB');
+    app.listen(3000, ()=>{
+        console.log('Server is running on port 3000');
+    })
 })
-
-app.use("/", (err, req, res, next)=>{
-    console.error(err.message); 
-    res.status(400).send(err.message);
-})
-
-app.listen(3000, ()=>{
-    console.log('Server is running on port 3000');
+.catch((err)=>{
+    console.error(err);
 })
