@@ -3,7 +3,9 @@ const admin = require('./middlewares/adminAuth')
 const {adminAuth, userAuth} = require('./middlewares/adminAuth');
 const connectDB = require('../src/config/database')
 const {UserModel} = require('../src/models/user')
-var validator = require('validator')
+const validator = require('validator')
+const {validationFunction} = require('./utils/validation')
+const bcrypt = require('bcrypt')
 
 const app = express();
 
@@ -21,26 +23,27 @@ app.post("/signup", async (req, res)=>{
     //     password: "123456"
     // })
 
-    const user = new UserModel(req.body)
-    //  here as we have used express.json(), we can easily parse the req in JSON format
+    //As soon as we get the details of the USER, 1. We will validate the Data, 2. Encrypt the data
+
+    //// 1. Validate DATA ......................
 
     try{
-        const validEmail = validator.isEmail(user.email);
-        if(!validEmail)
-        {
-            throw new Error("Invalid Email!")
-        }
+        validationFunction(req)
+    }catch(e){
+        return res.send(e.message);
+    }
 
-        const oldEmail = await UserModel.findOne({email: user.email});
-        if(oldEmail)
-        {
-            throw new Error("Email already exists!")
-        }
+    const {firstName, lastName, email, password} = req.body;
 
-        if(!validator.isStrongPassword(user.password))
-        {
-            throw new Error("Password should be strong!")
-        }
+    //// 2. HASHING THE PASSWORD before storing in the DB..........................
+
+    const hashedPass = bcrypt.hashSync(password, 10);
+
+    const user = new UserModel({firstName, lastName, email, password: hashedPass})        // THIS IS A VERY BAD WAY to create a new USER!!!!!!!     
+
+    // //  here as we have used express.json(), we can easily parse the req in JSON format
+
+    try{
 
         await user.save();
         res.send("User added successfully!!!")
@@ -49,7 +52,35 @@ app.post("/signup", async (req, res)=>{
         console.log("ERROR = ", err);
         res.status(400).send("Error in post req for database")
     }
-    // res.send("User created SUCCESSFULLY!!!!");
+})
+
+
+// LOGIN USER
+app.post('/login', async (req, res)=>{
+
+    try{
+        
+        const {email, password} = req.body;
+
+        const user = await UserModel.findOne({email: email});
+        if(!user)
+        {
+            throw new Error("ERROR : Authentication Error! Check email and password.");
+        }
+        
+        const hashedPass = user.password;
+        const match = await bcrypt.compare(password, user.password); 
+
+        if (match) {
+            res.send("Login SUCCESSFUL!");
+        } else {
+            res.status(400).send("ERROR: Incorrect Password!");
+        }
+
+
+    }catch(e){
+        res.status(400).send(e.message);
+    }
 })
 
 
@@ -69,7 +100,9 @@ app.get("/getAllUsers", async (req, res)=>{
 // DELETING AN USER FROM DB BY ID
 app.post("/user/delete/:userId", async(req, res)=>{
     const id = req.params.userId;
+    // const name = req.params.name;
     console.log(id);
+    // console.log(name);
 
     try{
         const deletedUser = await UserModel.findByIdAndDelete({_id : id});
