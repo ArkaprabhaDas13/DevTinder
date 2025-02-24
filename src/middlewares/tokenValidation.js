@@ -13,11 +13,11 @@ const tokenValidation = async (req, res, next)=>{
 
         const decoded = await jwt.verify(token, "secret");
         const {_id} = decoded;
-        console.log("Decoded id = ", _id);
+        // console.log("Decoded id = ", _id);
 
         const user = await UserModel.findById(_id);
 
-        console.log("User = ", user);
+        // console.log("User = ", user);
 
         if(!user)
         {
