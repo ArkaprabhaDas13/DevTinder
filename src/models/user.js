@@ -63,7 +63,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.methods.createJWT = async function(){
     // console.log("CreateJWT function has EXECUTED!!");
-    //Here instead of user.id, we use this because this refers to the current instance.
+    //Here instead of user.id, we use this.id because this refers to the current instance.
     // Also this funciton cannot be an ARROW FUNCTION because an arrow funcitons donot have their own 'this'. It references its PARENT SCOPE which here is the GLOBAL scope.
     const token = await jwt.sign({_id: this._id}, "secret", {expiresIn: '1d'});
     return token;

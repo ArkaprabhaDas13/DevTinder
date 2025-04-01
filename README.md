@@ -109,3 +109,13 @@ Add API level validation on Patch request & Signup post api
 DATA SANITISATION
 
 VALIDATION -> npm i validator
+
+
+wghenn clicked on nanny, open modal with details of baby
+-address
+-timing
+-job details
+
+
+ADD to BOOK
+

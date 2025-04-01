@@ -9,13 +9,22 @@ const bcrypt = require('bcrypt')
 const cors = require('cors')
 const cookieParser = require('cookie-parser');
 const { tokenValidation } = require('../middlewares/tokenValidation')
+const {profileEditValidation} = require('../utils/validation')
 
 const profileRouter = express.Router();
 
 // PROFILE 
 profileRouter.get('/profile', tokenValidation, async (req, res) => {
-
     res.send("Profile Page");
+})
+
+// PROFILE EDIT
+profileRouter.patch('/profile/edit', tokenValidation, async(req, res)=>{
+   
+    profileEditValidation(req);
+    console.log("REQ USER = ",req.user);
+    res.send(req.user);
+
 })
 
 module.exports = profileRouter;
