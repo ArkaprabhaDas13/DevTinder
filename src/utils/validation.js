@@ -24,10 +24,13 @@ const validationFunction = (req, res, next)=>{
 const profileEditValidation = (req)=>{
     const editables = ["firstName", "lastName", "age", "gender", "photoUrl", "about", "skills"];
 
-    const editCheck = Object.keys((key)=>(
+    // console.log(Object.keys(req.body));
+
+    const editCheck = Object.keys(req.body).every((key)=>(
         editables.includes(key)
     ))
-    console.log("REQUEST BODY  ======> ", req.body);
+
+    // console.log("REQUEST BODY  ======> ", req.body);
     
     return editCheck;
 }
