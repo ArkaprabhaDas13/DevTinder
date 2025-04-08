@@ -20,4 +20,19 @@ const validationFunction = (req, res, next)=>{
     next();
 }
 
-module.exports = {validationFunction}
+
+const profileEditValidation = (req)=>{
+    const editables = ["firstName", "lastName", "age", "gender", "photoUrl", "about", "skills"];
+
+    // console.log(Object.keys(req.body));
+
+    const editCheck = Object.keys(req.body).every((key)=>(
+        editables.includes(key)
+    ))
+
+    // console.log("REQUEST BODY  ======> ", req.body);
+    
+    return editCheck;
+}
+
+module.exports = {validationFunction, profileEditValidation}

@@ -13,7 +13,7 @@ const { tokenValidation } = require('../middlewares/tokenValidation')
 
 const authRouter = express.Router(); 
 
-// CREATING AN USER IN DB
+// SIGNING IN AN USER
 authRouter.post("/signup", validationFunction, async (req, res) => {
 
     // THis details is coming from req.body...
@@ -71,5 +71,13 @@ authRouter.post('/login', async (req, res) => {
         res.status(400).send(e.message);
     }
 })
+
+
+// LOGOUT USER
+
+authRouter.post('/logout', (req, res)=>{
+    res.clearCookie("token").send("LOGGED OUT!!");
+})
+
 
 module.exports = authRouter;
