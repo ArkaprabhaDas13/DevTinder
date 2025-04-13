@@ -9,6 +9,7 @@ const bcrypt = require('bcrypt')
 const cors = require('cors')
 const cookieParser = require('cookie-parser');
 const { tokenValidation } = require('../middlewares/tokenValidation')
+const {forgotPasswordFieldValidation} = require('../utils/validation')
 
 
 const authRouter = express.Router(); 
@@ -77,6 +78,43 @@ authRouter.post('/login', async (req, res) => {
 
 authRouter.post('/logout', (req, res)=>{
     res.clearCookie("token").send("LOGGED OUT!!");
+})
+
+
+// FORGOT PASSWORD : when we are forgetting the password, we will only enter the email and new password. We will create a validation to check if the retyped new password is the same as the new password. Then we will update the user in the DB.
+
+authRouter.post('/forgotPassword', async (req, res)=>{
+    
+    const fieldValidation = forgotPasswordFieldValidation(req.body);
+    console.log("Field Validation = ", fieldValidation);
+
+    if(fieldValidation)
+    {
+        try{
+            if(req.body.password === req.body.password2)
+            {
+                const user = await UserModel.findOne({email: req.body.email})
+
+                const hashedPass = bcrypt.hashSync(req.body.password, 10)
+
+                Object.keys(req.body).every((key)=>(
+                    user["password"] = hashedPass
+                ))
+
+                user.save();
+            }
+            else{
+                res.send("Password doesnt match !")
+            }
+            res.send("forgot password successful");
+        }catch(err){
+            res.send(err.message)
+        }
+    }
+    else{
+        res.send("forgot password unsuccessful");
+    }
+
 })
 
 

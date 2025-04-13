@@ -35,4 +35,19 @@ const profileEditValidation = (req)=>{
     return editCheck;
 }
 
-module.exports = {validationFunction, profileEditValidation}
+
+const forgotPasswordFieldValidation = (obj) =>{
+
+    const acceptableValues = ["email", "password", "password2"];
+    const {email, password, password2} = obj;
+
+    console.log(obj);
+
+    const booleanVal = Object.keys(obj).every((key)=>(
+        acceptableValues.includes(key)
+    ))
+
+    return booleanVal;
+}
+
+module.exports = {validationFunction, profileEditValidation, forgotPasswordFieldValidation}
