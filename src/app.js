@@ -26,5 +26,5 @@ connectDB()
         })
     })
     .catch((err) => {
-        console.error(err); 
+        console.error(`Error connection to DB : ${err.message}`); 
     })

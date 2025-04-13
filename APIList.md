@@ -10,11 +10,15 @@ PROFILE ROUTER:
 /GET : /profile/view                DONE
 /PATCH : /profile/edit              DONE
 /PATCH : /profile/password                         // this is for Forget Password
+
 (Validate and sanitize data in post/patch apis)
 
 CONNECTION REQUEST ROUTER:
+
 /POST : /request/send/interested/:userID
 /POST : /request/send/ignored/:userID
+("THESE 2 APIs can be made using a single dynamic API")
+
 /POST : /request/review/accepted/:requestID
 /POST : /request/review/rejected/:requestID
 
@@ -30,4 +34,4 @@ USER ROUTER:
 
 Homework:
 
-keep the top 6 APIs ready before moving to the next episode
+keep the top 6 APIs ready before moving to the next episode     
