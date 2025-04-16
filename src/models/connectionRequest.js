@@ -20,6 +20,10 @@ const connectionRequestSchema = new mongoose.Schema({
     {timestamps: true}
 )
 
+// connectionRequestSchema.method(selfValidator, function(){
+//     if(this.fromUserId === this.toUse)
+// })
+
 const ConnectionRequest = new mongoose.model("ConnectionRequest", connectionRequestSchema);
 
 module.exports = ConnectionRequest;

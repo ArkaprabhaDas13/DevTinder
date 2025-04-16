@@ -22,7 +22,10 @@ requestRouter.post(`/request/send/:status/:toUserId`, tokenValidation, async (re
         const status  = req.params.status
         const name = req.query.name
 
-        // now we have to verify the status : "Interested" and "Ignored"
+        // CHECK 1 : Make sure the fromUserID is not equal to the toUserID
+
+
+        // CHECK 2 : now we have to verify the status : "Interested" and "Ignored" only
         const allowedStatus = ["interested", "ignored"];
         if(!allowedStatus.includes(status))
         {
@@ -35,6 +38,36 @@ requestRouter.post(`/request/send/:status/:toUserId`, tokenValidation, async (re
             status
         })
 
+
+        // CHECK 3 : before we save to the DB, we should check if the Connection Request already exists
+        // for 'sender to receiver' and for 'receiver to sender'
+        const existingConnectionRequest = await ConnectionRequest.findOne({
+            $or: [
+                {
+                    fromUserId : fromUserId,
+                    toUserId : toUserId
+                },
+                {
+                    fromUserId : toUserId,
+                    toUserId: fromUserId
+                }
+            ]
+        })
+        if(existingConnectionRequest)
+        {
+            return res.status(400).send({message:"connection request already exists"});
+        }
+        
+
+        // CHECK 4 : check if the USER ID is a valid id and exists in the DB
+        const presentUser = await UserModel.findById(toUserId);
+        if(!presentUser)
+        {
+            return res.status(400).send({message: "User ID doesnt exist !!"})
+        }
+
+
+        //....... saving the connection to the DB
         const data = await(connectionRequest.save())
 
         res.json({
