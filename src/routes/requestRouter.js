@@ -14,16 +14,23 @@ const ConnectionRequest = require('../models/connectionRequest')
 
 
 //sendConnectionRequest
-requestRouter.post(`/request/send/:status/:toUserId`, tokenValidation, async (req, res) => {
+requestRouter.post(`/request/send/:status/:toUserId`, tokenValidation, async (req, res, next) => {
     try{
         
-        const fromUserId = req.user._id;
-        const toUserId = req.params.toUserId
-        const status  = req.params.status
-        const name = req.query.name
+        const fromUserId = req.user._id.toString();
+        const toUserId = req.params.toUserId.toString();
+        const status  = req.params.status;
+        const name = req.query.name;
 
-        // CHECK 1 : Make sure the fromUserID is not equal to the toUserID
+        
 
+        // // CHECK 1 : Make sure the fromUserID is not equal to the toUserID
+        // (However this problem is solved using a PRE-funciton in the Schema which runs whenever the save() is used for that model)
+        
+        // if(fromUserId === toUserId)
+        // {
+        //     return res.status(400).send("Cannot send request to yourself!");
+        // }
 
         // CHECK 2 : now we have to verify the status : "Interested" and "Ignored" only
         const allowedStatus = ["interested", "ignored"];

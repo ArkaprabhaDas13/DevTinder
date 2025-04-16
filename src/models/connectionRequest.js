@@ -20,9 +20,23 @@ const connectionRequestSchema = new mongoose.Schema({
     {timestamps: true}
 )
 
-// connectionRequestSchema.method(selfValidator, function(){
-//     if(this.fromUserId === this.toUse)
-// })
+// The pre-function only runs whem save() is called / when 
+// the collection is saved to the DB
+// DETAILS: Even though the pre-function is a middleware, it is working at DB Model Level 
+// Here we cannot use res.send() because this is not in the control flow of HTTP request
+// tokenValidation.js is present inside the request-response cycle so it has 
+// control over the res.send()
+
+connectionRequestSchema.pre("save", function(next){
+    // Here we have to initialise the schema through 'this' keyword
+    const connectionRequest = this;
+
+    if(connectionRequest.fromUserId.toString() === connectionRequest.toUserId.toString())
+    {
+        throw new Error("Cannot send connection req to yourself!")
+    }
+    next();
+})
 
 const ConnectionRequest = new mongoose.model("ConnectionRequest", connectionRequestSchema);
 

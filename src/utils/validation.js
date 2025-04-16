@@ -41,7 +41,7 @@ const forgotPasswordFieldValidation = (obj) =>{
     const acceptableValues = ["email", "password", "password2"];
     const {email, password, password2} = obj;
 
-    console.log(obj);
+    // console.log(obj);
 
     const booleanVal = Object.keys(obj).every((key)=>(
         acceptableValues.includes(key)
