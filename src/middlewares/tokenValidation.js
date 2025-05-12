@@ -17,8 +17,6 @@ const tokenValidation = async (req, res, next)=>{
 
         const user = await UserModel.findById(_id);
 
-        // console.log("User = ", user);
-
         if(!user)
         {
             throw new Error("User Doesnt Exist !!!")
@@ -28,7 +26,6 @@ const tokenValidation = async (req, res, next)=>{
         req.user = user;
 
         next();
-    
     }catch(err){
         res.status(400).send("Error = " + err.message);
     }    

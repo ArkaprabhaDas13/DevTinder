@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const connectionRequestSchema = new mongoose.Schema({
         fromUserId : {
             type: mongoose.Schema.Types.ObjectId,
+            ref: "UserModel",       //reference to the UserModel Collection
             required: true
         },
         toUserId : {
@@ -19,6 +20,10 @@ const connectionRequestSchema = new mongoose.Schema({
     },
     {timestamps: true}
 )
+
+// COMPOUND INDEXING
+connectionRequestSchema.index({fromUserId: 1, toUserId: 1});
+
 
 // The pre-function only runs whem save() is called / when 
 // the collection is saved to the DB
