@@ -16,6 +16,7 @@ const authRouter = express.Router();
 
 // SIGNING IN AN USER
 authRouter.post("/signup", validationFunction, async (req, res) => {
+    //// 1. Validating the Email Passwords and other inputs using Middleware - validationFunction
 
     // THis details is coming from req.body...
     // const user = new UserModel({
@@ -27,7 +28,7 @@ authRouter.post("/signup", validationFunction, async (req, res) => {
 
     //As soon as we get the details of the USER, 1. We will validate the Data, 2. Encrypt the data
 
-    //// 1. Validating the Email Passwords and other inputs using Middleware
+
     const { firstName, lastName, email, password } = req.body;
 
     //// 2. HASHING THE PASSWORD before storing in the DB..........................
@@ -52,7 +53,11 @@ authRouter.post("/signup", validationFunction, async (req, res) => {
 authRouter.post('/login', async (req, res) => { 
     try {
         const { email, password } = req.body;
-        const user = await UserModel.findOne({ email: email });                         // finding the user with the Login email
+
+        // here findOne returns only one result
+        // find returns an array even if the number of results is 1
+        // so for using schema methods, its better to use findOne()
+        const user = await UserModel.findOne({ email: email });           // finding the user with the Login email using INDEXING
         if (!user) {
             throw new Error("ERROR : Authentication Error! Check email and password.");
         }
