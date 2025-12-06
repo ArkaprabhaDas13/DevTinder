@@ -12,6 +12,7 @@ const tokenValidation = async (req, res, next)=>{
         }
 
         const decoded = await jwt.verify(token, "secret");
+        
         const {_id} = decoded;
         // console.log("Decoded id = ", _id); 
 

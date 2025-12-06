@@ -15,7 +15,7 @@ const connectionRequestSchema = new mongoose.Schema({
             type: String,
             enum:{
                 values : ["ignored", "interested", "accepted", "rejected"],
-                message: '{value} : Invalid status'
+                message: '{value} : Invalid status' 
             } 
         }
     },
@@ -23,7 +23,7 @@ const connectionRequestSchema = new mongoose.Schema({
 ) 
 
 // COMPOUND INDEXING
-connectionRequestSchema.index({fromUserId: 1, toUserId: 1});
+connectionRequestSchema.index({fromUserId: 1, toUserId: 1}); 
 
 
 // The pre-function only runs whem save() is called / when 
