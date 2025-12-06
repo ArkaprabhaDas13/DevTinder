@@ -22,7 +22,7 @@ const validationFunction = (req, res, next)=>{
 
 
 const profileEditValidation = (req)=>{
-    const editables = ["firstName", "lastName", "age", "gender", "photoUrl", "about", "skills"];
+    const editables = ["firstName", "lastName", "age", "email", "gender", "photoUrl", "about", "skills"];
 
     // console.log(Object.keys(req.body));
 
@@ -43,11 +43,11 @@ const forgotPasswordFieldValidation = (obj) =>{
 
     // console.log(obj);
 
-    const booleanVal = Object.keys(obj).every((key)=>(
+    const isValid = Object.keys(obj).every((key)=>(
         acceptableValues.includes(key)
     ))
 
-    return booleanVal;
+    return isValid;
 }
 
 module.exports = {validationFunction, profileEditValidation, forgotPasswordFieldValidation}

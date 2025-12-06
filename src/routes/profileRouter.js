@@ -14,7 +14,7 @@ const {profileEditValidation} = require('../utils/validation')
 const profileRouter = express.Router();
 
 // PROFILE 
-profileRouter.get('/profile', tokenValidation, async (req, res) => {
+profileRouter.get('/view', tokenValidation, async (req, res) => {
     try{
         res.send(req.user);
     }catch(err){
@@ -23,7 +23,7 @@ profileRouter.get('/profile', tokenValidation, async (req, res) => {
 })
 
 // PROFILE EDIT
-profileRouter.patch('/profile/edit', tokenValidation, async(req, res)=>{
+profileRouter.patch('/edit', tokenValidation, async(req, res)=>{
    
     try{
         const booleanValue = profileEditValidation(req);
@@ -40,6 +40,7 @@ profileRouter.patch('/profile/edit', tokenValidation, async(req, res)=>{
             // console.log("NEW USER ====> ",  UserModel.findById(req.body._id))
             console.log("USER ----->", user);
 
+            //we are replacing the previous values with the new values
             Object.keys(req.body).every((key)=>(
                 user[key] = req.body[key]
             ))

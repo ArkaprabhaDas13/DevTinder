@@ -16,18 +16,6 @@ const authRouter = express.Router();
 
 // SIGNING IN AN USER
 authRouter.post("/signup", validationFunction, async (req, res) => {
-    //// 1. Validating the Email Passwords and other inputs using Middleware - validationFunction
-
-    // THis details is coming from req.body...
-    // const user = new UserModel({
-    //     firstName: "Tim",
-    //     lastName: "Cook",
-    //     email: "tim@gmail.com",
-    //     password: "123456"
-    // })
-
-    //As soon as we get the details of the USER, 1. We will validate the Data, 2. Encrypt the data
-
 
     const { firstName, lastName, email, password } = req.body;
 
@@ -47,6 +35,7 @@ authRouter.post("/signup", validationFunction, async (req, res) => {
         console.log("ERROR = ", err);
         res.status(400).send("Error in post req for database")
     }
+
 })
 
 // LOGIN USER 
@@ -88,38 +77,16 @@ authRouter.post('/logout', (req, res)=>{
 
 // FORGOT PASSWORD : when we are forgetting the password, we will only enter the email and new password. We will create a validation to check if the retyped new password is the same as the new password. Then we will update the user in the DB.
 
-authRouter.post('/forgotPassword', async (req, res)=>{
+authRouter.post('/forgotPassword', tokenValidation, async (req, res)=>{
     
-    const fieldValidation = forgotPasswordFieldValidation(req.body);
-    console.log("Field Validation = ", fieldValidation);
-
-    if(fieldValidation)
+    const allowedFields = ["email", "password"];
+    const isValid = Object.keys(req.body).forEach((item)=>(
+        allowedFields.includes(item)
+    ))
+    if(isValid)
     {
-        try{
-            if(req.body.password === req.body.password2)
-            {
-                const user = await UserModel.findOne({email: req.body.email})
-
-                const hashedPass = bcrypt.hashSync(req.body.password, 10)
-
-                Object.keys(req.body).every((key)=>(
-                    user["password"] = hashedPass
-                ))
-
-                user.save();
-            }
-            else{
-                res.send("Password doesnt match !")
-            }
-            res.send("forgot password successful");
-        }catch(err){
-            res.send(err.message)
-        }
+        
     }
-    else{
-        res.send("forgot password unsuccessful");
-    }
-
 })
 
 

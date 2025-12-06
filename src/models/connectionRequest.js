@@ -15,12 +15,12 @@ const connectionRequestSchema = new mongoose.Schema({
             type: String,
             enum:{
                 values : ["ignored", "interested", "accepted", "rejected"],
-                message: "Invalid status"
+                message: '{value} : Invalid status'
             } 
         }
     },
     {timestamps: true}
-)
+) 
 
 // COMPOUND INDEXING
 connectionRequestSchema.index({fromUserId: 1, toUserId: 1});

@@ -8,6 +8,35 @@ Difference between caret and tilde ( ^ vs ~ )
 
 initialize git
 
+
+//----------------------------------------------//
+
+*Routes:*
+
+## Auth
+POST /signup
+POST /login
+POST /logout
+
+## Profile
+GET /profile/view
+PATCH /profile/edit
+PATCH /profile/password
+
+## Connection Req
+POST /request/send/interested/:id
+POST /request/send/ignored/:id
+POST /request/review/accepted/:requestId
+POST /request/review/rejected/:requestId
+
+## User Router
+GET /connections
+GET /requests/received
+
+//----------------------------------------------//
+
+
+
 .gitignore
 
 Create a remote repo on github
@@ -18,7 +47,7 @@ Play with routes and route extensions ex. /hello, / , hello/2, /xyz
 
 Order of the routes matter a lot
 
-Install Postman app and make a workspace/collectio > test API call
+In stall Postman app and make a workspace/collectio > test API call
 
 Write logic to handle GET, POST, PATCH, DELETE API Calls and test them on Postman
 
@@ -117,5 +146,5 @@ wghenn clicked on nanny, open modal with details of baby
 -job details
 
 
-ADD to BOOK
+
 
