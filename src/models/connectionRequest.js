@@ -33,13 +33,13 @@ connectionRequestSchema.index({fromUserId: 1, toUserId: 1});
 // tokenValidation.js is present inside the request-response cycle so it has 
 // control over the res.send()
 
-connectionRequestSchema.pre("save", function(next){
-    // Here we have to initialise the schema through 'this' keyword
-    const connectionRequest = this;
 
-    if(connectionRequest.fromUserId.toString() === connectionRequest.toUserId.toString())
+connectionRequestSchema.pre('save', function(next){
+    const connection = this;
+    // here toString() is required because the MongoDB objects have different addresses even though the id is same
+    if(connection.fromUserId.toString() === connection.toUserId.toString())
     {
-        throw new Error("Cannot send connection req to yourself!")
+        throw new Error("Canot send connection to yourself!")
     }
     next();
 })
