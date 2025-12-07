@@ -1,128 +1,56 @@
 const express = require('express');
-const { tokenValidation } = require('../middlewares/tokenValidation')
 const requestRouter = express.Router();
-const ConnectionRequest = require('../models/connectionRequest')
+const {tokenValidation} = require('../middlewares/tokenValidation');
+const ConnectionRequest = require('../models/connectionRequest');
+const UserModel = require('../models/user');
 
+// Statuses : IGNORED and INTERESTED
 
-// //sendConnectionRequest API (SENDER)
-// requestRouter.post(`/send/:status/:toUserId`, tokenValidation, async (req, res, next) => {
-//     try{
+requestRouter.post('/send/:status/:toUserId', tokenValidation, async (req, res)=>{
+    try{
         
-//         const fromUserId = req.user._id.toString();
-//         const toUserId = req.params.toUserId.toString();
-//         const status  = req.params.status;
-//         const name = req.query.name;
+        const fromUserId = req.user._id;
+        const toUserId = req.params.toUserId;
+        const status = req.params.status;
 
+        // 1. Check for STATUS value 
+        const acceptedStatus = ["ignored", "interested"];
+        const isStatusValid = acceptedStatus.includes(status);
+        if(!isStatusValid)
+        {
+            // both will work
+            throw new Error(`invalid Status type : ${status}`)
+            // return res.status(400).json({message: "invalid status type : "+status})
+        }
 
-//         // // CHECK 1 : Make sure the fromUserID is not equal to the toUserID
-//         // (However this problem is solved using a PRE-funciton in the Schema which runs whenever the save() is used for that model)
+        // 2. Check if the connection request exists for the same users or vice versa
+        const existingConnectionRequest = await ConnectionRequest.findOne({
+            $or: [
+                {fromUserId: fromUserId, toUserId: toUserId},
+                {fromUserId: toUserId, toUserId: fromUserId}
+            ]
+        })
+        if(existingConnectionRequest)
+        {
+            throw new Error(`Connection Request already exists : ${existingConnectionRequest}`);
+        }
+
+        // 3. Check if the toUserId exists inside the DB
+        const doesToUserIdExists = await UserModel.findOne({_id: toUserId});
+        if(!doesToUserIdExists)
+        {
+            throw new Error("User doesnt Exist in DB");
+        }
         
-//         // if(fromUserId === toUserId)
-//         // {
-//         //     return res.status(400).send("Cannot send request to yourself!");
-//         // }
+        const connectionRequest = new ConnectionRequest({fromUserId, toUserId, status});
+        const data = await connectionRequest.save();
 
-//         // CHECK 2 : now we have to verify the status : "Interested" and "Ignored" only
-//         const allowedStatus = ["interested", "ignored"];
-//         if(!allowedStatus.includes(status))
-//         {
-//             return res.status(400).json({error:"Invalid status type!"})
-//         }
+        res.status(200).json({data});
 
-//         const connectionRequest = new ConnectionRequest({
-//             fromUserId,
-//             toUserId,
-//             status
-//         })
-
-
-//         // CHECK 3 : before we save to the DB, we should check if the Connection Request already exists
-//         // for 'sender to receiver' and for 'receiver to sender'
-//         const existingConnectionRequest = await ConnectionRequest.findOne({
-//             $or: [
-//                 {
-//                     fromUserId : fromUserId,
-//                     toUserId : toUserId
-//                 },
-//                 {
-//                     fromUserId : toUserId,
-//                     toUserId: fromUserId
-//                 }
-//             ]
-//         })
-//         if(existingConnectionRequest)
-//         {
-//             return res.status(400).send({message:"connection request already exists"});
-//         }
-        
-
-//         // CHECK 4 : check if the USER ID is a valid id and exists in the DB
-//         const presentUser = await UserModel.findById(toUserId);
-//         if(!presentUser)
-//         {
-//             return res.status(400).send({message: "User ID doesnt exist !!"})
-//         }
-
-
-//         //....... saving the connection to the DB
-//         const data = await(connectionRequest.save())
-
-//         const sender = await UserModel.findById(fromUserId);
-//         const receiver = await UserModel.findById(toUserId);
-
-//         const senderName = sender.firstName;
-//         const receiverName = receiver.firstName;
-
-//         res.json({
-//             message:  `${senderName}->${status}->${receiverName}`,
-//             data: data
-//         });
-
-//     }catch(err){
-//         res.status(400).send(`Error Message: ${err.message}`)
-//     }
-// }) 
-
-
-// // API FOR Accepting/Rejecting CONNECTION REQUEST (Receiver)
-
-// requestRouter.post("/review/:status/:requestId", tokenValidation, async(req, res, next)=>{
-//     try{
-//         const loggedInUser = req.user;
-//         const {status, requestId} = req.params;
-
-//         // return an error response if the status is not these words
-//         const allowedStatus = ["accepted", "rejected"];
-//         if(!allowedStatus.includes(status))
-//         {
-//             return res.status(400).json({message:"Status not found/incorrect"});
-//         }
-
-//         const connectionRequest = await ConnectionRequest.findOne({
-//             _id: requestId,
-//             toUserId: loggedInUser._id,
-//             status: "interested"
-//         });
-
-//         if(!connectionRequest)
-//         {
-//             return res.status(400).json({message: "Connection request not found!"});
-//         }
-
-//         connectionRequest.status = status;
-//         const data = await connectionRequest.save();
-
-//         res.send({message:"Connection request ", status, data});
-
-//     }catch(err){
-//         res.status(400).send("Error : ", err.message)
-//     }
-// })
-
-
-// API to send Request INTERESTED/IGNORED
-
-
+    }catch(err){
+        res.status(400).send(err.message);
+    }
+})
 
 
 module.exports = requestRouter;
