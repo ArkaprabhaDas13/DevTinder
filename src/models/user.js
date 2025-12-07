@@ -61,6 +61,8 @@ const userSchema = new mongoose.Schema({
 }, {timestamps: true});
 
 
+userSchema.index({firstName: 1, lastName: 1});
+
 userSchema.methods.createJWT = async function(){
     // console.log("CreateJWT function has EXECUTED!!");
     //Here instead of user.id, we use this.id because this refers to the current instance.
