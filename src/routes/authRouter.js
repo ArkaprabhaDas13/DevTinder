@@ -12,18 +12,14 @@ authRouter.post("/signup", validationFunction, async (req, res) => {
 
     const { firstName, lastName, email, password } = req.body;
 
-    ////  HASHING THE PASSWORD before storing in the DB ..........................
-    const hashedPass = bcrypt.hashSync(password, 10);
-
-    const user = new UserModel({ firstName, lastName, email, password: hashedPass })        // THIS IS A VERY BAD WAY to create a new USER!!!!!!!     
+    const user = new UserModel({ firstName, lastName, email, password })        // THIS IS A VERY BAD WAY to create a new USER!!!!!!!     
 
     ////  here as we have used express.json(), we can easily parse the req in JSON format        
 
     try {
         await user.save();
         res.send("User added successfully !!!");
-    }
-    catch (err) {
+    }catch (err) {
         console.log("ERROR = ", err);
         res.status(400).send("Error in post req for database");
     }

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
+
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
@@ -60,6 +61,12 @@ const userSchema = new mongoose.Schema({
     }
 }, {timestamps: true});
 
+
+userSchema.pre("save", async function(next){
+    const hashedPassword = await bcrypt.hashSync(this.password, 10);
+    this.password = hashedPassword;
+    next();
+})
 
 userSchema.methods.createJWT = async function(){
     // console.log("CreateJWT function has EXECUTED!!");

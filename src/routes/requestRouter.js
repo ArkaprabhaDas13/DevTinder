@@ -53,4 +53,40 @@ requestRouter.post('/send/:status/:toUserId', tokenValidation, async (req, res)=
 })
 
 
+// REVIEW : ACCEPT or REJECT
+
+requestRouter.post('/review/:status/:requestId', tokenValidation, async(req, res)=>{
+
+    try{
+        const loggedInUser = req.user._id; 
+        const {status, requestId} = req.params;
+
+        // Validate status for review endpoint
+        const acceptedReviewStatus = ["accepted", "rejected"];
+        if(!acceptedReviewStatus.includes(status)) {
+            throw new Error(`Invalid status : ${status}. Must be 'accepted' or 'rejected'`);
+        }
+
+        const connectionRequest = await ConnectionRequest.findOne({
+            _id : requestId,
+            toUserId : loggedInUser,
+            status : "interested"
+        })
+        if(!connectionRequest)
+        {
+            throw new Error("Connection not found :(");
+        }
+
+        connectionRequest.status = status;
+
+        const data = await connectionRequest.save();
+
+        res.status(200).json({message: "Connection request " + status})
+    }catch(err)
+    {
+        res.status(400).send(err.message);
+    }
+
+})
+
 module.exports = requestRouter;
