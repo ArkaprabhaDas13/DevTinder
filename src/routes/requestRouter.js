@@ -36,16 +36,17 @@ requestRouter.post('/send/:status/:toUserId', tokenValidation, async (req, res)=
         }
 
         // 3. Check if the toUserId exists inside the DB
-        const doesToUserIdExists = await UserModel.findOne({_id: toUserId});
-        if(!doesToUserIdExists)
+        const toUser = await UserModel.findOne({_id: toUserId});
+        if(!toUser)
         {
             throw new Error("User doesnt Exist in DB");
         }
         
+        // Saving connection req to DB
         const connectionRequest = new ConnectionRequest({fromUserId, toUserId, status});
         const data = await connectionRequest.save();
 
-        res.status(200).json({data});
+        res.status(200).json({messaage : `${req.user.firstName} has sent ${status} connection req to ${toUser.firstName}`});
 
     }catch(err){
         res.status(400).send(err.message);
