@@ -67,6 +67,7 @@ userSchema.pre("save", async function(next){
     this.password = hashedPassword;
     next();
 })
+
 userSchema.index({firstName: 1, lastName: 1});
 
 userSchema.methods.createJWT = async function(){
