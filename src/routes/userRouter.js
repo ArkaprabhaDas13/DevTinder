@@ -1,11 +1,11 @@
 const express = require("express");
 const { tokenValidation } = require("../middlewares/tokenValidation");
 const ConnectionRequest = require("../models/connectionRequest");
-// const { populate } = require("../models/user");
+const UserModel = require("../models/user");
 const userRouter = express.Router();
 
 
-// SHOWS the connections who has accepted your invite or you have accepted their invitation
+// SHOWS all the connections sent to the USER
 userRouter.get('/requests/received', tokenValidation, async(req, res)=>{
     try{
         const loggedInUser = req.user._id;
@@ -34,28 +34,10 @@ userRouter.get('/requests/received', tokenValidation, async(req, res)=>{
 })
 
 
-// SHOWS all the connections sent to the USER
+// SHOWS the connections who have accepted your invite or you have accepted their invitation
 userRouter.get('/connections', tokenValidation, async(req, res)=>{
     try{   
         const loggedInUser = req.user._id;
-
-        // const connectionRequests = await ConnectionRequest.find({
-        //     $or: [
-        //         {toUserId: loggedInUser._id, status: "accepted"},
-        //         {fromUserId: loggedInUser._id, status: "accepted"}
-        //     ]
-        // }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "gender"])
-        // .populate("toUserId", ["firstName", "lastName", "photoUrl", "gender"])
-
-        // // Lets say when the logged in user is sending a request to someone else,
-        // // and the user accepts the invite, we are only going to show the user whome the 
-        // // connection was sent, not the logged in user
-        // const data = connectionRequests.map((item)=>{
-        //     if(item.fromUserId._id.toString() === loggedInUser._id.toString())
-        //         return item.toUserId;
-
-        //     return item.fromUserId
-        // })
 
         const connections = await ConnectionRequest.find({
             $or: [
@@ -69,8 +51,8 @@ userRouter.get('/connections', tokenValidation, async(req, res)=>{
         const data = connections.map((item)=>{
             if(item.fromUserId._id.toString() === loggedInUser._id.toString())
                 return item.toUserId;
-
-            return item.fromUserId
+            else
+                return item.fromUserId
         })
 
         if(data.length === 0)
@@ -85,6 +67,43 @@ userRouter.get('/connections', tokenValidation, async(req, res)=>{
         res.status(400).send({mmessage: err.message});
     }
 })
+
+
+// FEED PAGE: 
+// 1. People whome the logged in user has not sent a connection request (ignored/interested)
+// 2. Logged in user should not see HIMSELF
+// 3. Logged in user's connections
+
+userRouter.get("/feed", tokenValidation, async(req, res)=>{
+
+    try{
+        const loggedInUser = req.user._id;
+        
+        let notInFeedData = await ConnectionRequest.find({$or: [
+            {fromUserId : loggedInUser},
+            {toUserId : loggedInUser}, 
+        ]})
+
+        const hideUsers = new Set();
+        notInFeedData.forEach((item)=>{
+            hideUsers.add(item.fromUserId.toString());
+            hideUsers.add(item.toUserId.toString());
+        })
+
+        // console.log("Not in feed = ", hideUsers);
+
+        const feed = await UserModel.find({
+            $and: [
+                {_id: {$nin: Array.from(hideUsers)}},
+                {_id: {$ne: loggedInUser}}
+            ]}).select("firstName lastName photoUrl gender skills about");     
+        res.status(200).send({data: feed});
+    }catch(err)
+    {
+        res.status(400).send({message: err.message})
+    }
+})
+
 
 module.exports = userRouter;
 

@@ -24,14 +24,13 @@ PATCH /profile/edit
 PATCH /profile/password
 
 ## Connection Req
-POST /request/send/interested/:id
-POST /request/send/ignored/:id
-POST /request/review/accepted/:requestId
-POST /request/review/rejected/:requestId
+POST /request/send/:status/:id (interested/ignored)
+POST /request/review/:status/:requestId (accepted/rejected)
 
 ## User Router
 GET /connections
 GET /requests/received
+GET /feed           *** 
 
 //----------------------------------------------//
 
