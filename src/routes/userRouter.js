@@ -75,10 +75,15 @@ userRouter.get('/connections', tokenValidation, async(req, res)=>{
 // 3. Logged in user's connections
 
 userRouter.get("/feed", tokenValidation, async(req, res)=>{
-
     try{
         const loggedInUser = req.user._id;
-        
+        // we are using query parameters here : /feed?page=1&limit=4
+        const page = parseInt(req.query.page) || 1;            // page number
+        const limit = parseInt(req.query.limit) || 5;         // page size
+
+        // calcuate skip funciton according to page number
+        const skipVal = (page-1)*limit;
+
         let notInFeedData = await ConnectionRequest.find({$or: [
             {fromUserId : loggedInUser},
             {toUserId : loggedInUser}, 
@@ -96,8 +101,9 @@ userRouter.get("/feed", tokenValidation, async(req, res)=>{
             $and: [
                 {_id: {$nin: Array.from(hideUsers)}},
                 {_id: {$ne: loggedInUser}}
-            ]}).select("firstName lastName photoUrl gender skills about");     
-        res.status(200).send({data: feed});
+        ]}).select("firstName lastName photoUrl gender skills about").skip(skipVal).limit(limit);       // PAGINATION and DATA FILTERING
+
+        res.status(200).json({data: feed});
     }catch(err)
     {
         res.status(400).send({message: err.message})
